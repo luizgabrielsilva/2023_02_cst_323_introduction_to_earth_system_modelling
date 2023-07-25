@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "plots"
+version = "0.1.0"
+description = ""
+authors = ["Luiz Gabriel <luiz.gabriel.silva@alumni.usp.br>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+matplotlib = "^3.7.2"
+pandas = "^2.0.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
