@@ -2,7 +2,7 @@
 --- Version 0.1
 --- Luiz Gabriel and Thais
 
---myfile = File("waterDam_v_0.1_sim_5.csv") -- Saving Results
+myfile = File("waterDam_v_0.1_sim5.csv") -- Saving Results
 
 WaterInTheDam = Model{
     nInhab = 1e5,           -- number of inhabitants
@@ -24,10 +24,7 @@ WaterInTheDam = Model{
             model.waterVol = model.damCap
         elseif model.waterVol < 0 then
             model.waterVol = 0
-
-            end
-
-        model.energyCons = model.energyCons * (1 + model.growthRate)
+        end
 
         myfile:writeLine({model.waterVol})
 
@@ -36,11 +33,15 @@ WaterInTheDam = Model{
     init = function(model)
 
         model.timer = Timer{
+            Event{start=0, action=model},
+            Event{start=1, action=function()
+                    model.energyCons = model.energyCons * (1 + model.growthRate)
+                end
+            },
             Event{start=20, period=model.finalTime, action=function()
                     model.rain = model.coeffRainAfter1970 * model.rain
                 end
             },
-            Event{start=0, action = model},
         }
 
 
@@ -48,15 +49,15 @@ WaterInTheDam = Model{
 }
 
 --- Used for saving results
---env = Environment{
---    WaterInTheDam{
---        waterEnergyRatio=8e1,
---        growthRate=2.5e-2,
---        coeffRainAfter1970=5e-1,
---    }
---}
---
---env:run()
+env = Environment{
+    WaterInTheDam{
+        waterEnergyRatio=8e1,
+        growthRate=2.5e-2,
+        --coeffRainAfter1970=5e-1,
+    }
+}
+
+env:run(70)
 
 
 --- Used for verifying results

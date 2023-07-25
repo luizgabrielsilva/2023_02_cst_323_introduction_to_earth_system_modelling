@@ -59,6 +59,7 @@ WaterInTheDam = Model{
                     }
 
                     local month = round(((event:getTime() * 12) % 12) + 1)
+                    print(event:getTime() * 12)
                     model.seasonRain = monthlyRainCoeffs[month] * model.rain
                 end
             },
