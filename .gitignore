@@ -1,3 +1,16 @@
 \aulas
 \exercicios
 *.tme
+
+## Latex aux files
+*.aux
+*.fdb_latexmk
+*.fls
+*.gz
+*.log
+
+## Jupyter notebook
+\.ipynb_checkpoints
+
+## IDEs
+\.idea
