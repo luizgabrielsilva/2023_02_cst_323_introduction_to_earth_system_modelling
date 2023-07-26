@@ -3,7 +3,7 @@
 
 --- Luiz Gabriel and Thais
 
--- myfile = File("waterDam_v_1.0_sim_1.csv") -- Saving Results
+myfile = File("waterDam_v_1.1_sim_5.csv") -- Saving Results
 
 
 local round = function(a)
@@ -31,7 +31,7 @@ WaterInTheDam = Model{
             model.waterVol = 0
 
         end
-        --myfile:writeLine({model.waterVol})
+        myfile:writeLine({model.waterVol})
     end,
 
     init = function(model)
@@ -59,7 +59,6 @@ WaterInTheDam = Model{
                     }
 
                     local month = round(((event:getTime() * 12) % 12) + 1)
-                    print(event:getTime() * 12)
                     model.seasonRain = monthlyRainCoeffs[month] * model.rain
                 end
             },
@@ -78,15 +77,17 @@ WaterInTheDam = Model{
 --- Used for saving results
 env = Environment{
     WaterInTheDam{
---        waterEnergyRatio=8e1,
---        growthRate=2.5e-2,
---        coeffRainAfter1970=5e-1,
+        waterEnergyRatio=8e1,
+        growthRate=2.5e-2,
+        coeffRainAfter1970=5e-1,
     }
 }
 
---env:run()
---
---
+
+env:run()
+
+
+--- Used for verifying results
 --env = Environment{
 --    sim1 = WaterInTheDam{},
 --    sim2 = WaterInTheDam{waterEnergyRatio=8e1},
@@ -101,18 +102,18 @@ env = Environment{
 --
 --clean()
 --
-chart1 = Chart{
-    target = env,
-    select = {"waterVol"}
-}
+--chart1 = Chart{
+--    target = env,
+--    select = {"waterVol"}
+--}
 --
 --chart2 = Chart{
 --    target = env,
 --    select = {"energyCons"}
 --}
 --
-env:add(Event{period=1/12, action = chart1})
+--env:add(Event{period=1/12, action = chart1})
 --env:add(Event{action = chart2})
 --
 --
-env:run(50)
+--env:run()

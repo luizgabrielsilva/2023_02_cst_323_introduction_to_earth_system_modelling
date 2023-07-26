@@ -3,7 +3,7 @@
 
 --- Luiz Gabriel and Thais
 
---myfile = File("waterDam_v_0.2_sim_5.csv") -- Saving Results
+myfile = File("waterDam_v_0.2_sim_5.csv") -- Saving Results
 
 WaterInTheDam = Model{
     nInhab = 1e5,           -- number of inhabitants
@@ -37,11 +37,14 @@ WaterInTheDam = Model{
         model.timer = Timer{
             Event{start=0, action=function()
                     model.seasonRain = model.coeffFirstRain * model.rain
-                    model.energyCons = model.energyCons * (1 + model.growthRate)
                 end
             },
             Event{start=0.5, action=function()
                     model.seasonRain = model.coeffSecondRain * model.rain
+                end
+            },
+            Event{start=1, action=function()
+                    model.energyCons = model.energyCons * (1 + model.growthRate)
                 end
             },
             Event{start=20, period=model.finalTime, action=function()

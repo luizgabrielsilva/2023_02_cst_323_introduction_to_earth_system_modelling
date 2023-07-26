@@ -2,7 +2,7 @@
 --- Version 0.1
 --- Luiz Gabriel and Thais
 
-myfile = File("waterDam_v_0.1_sim5.csv") -- Saving Results
+myfile = File("waterDam_v_0.1_sim_5.csv") -- Saving Results
 
 WaterInTheDam = Model{
     nInhab = 1e5,           -- number of inhabitants
@@ -53,7 +53,7 @@ env = Environment{
     WaterInTheDam{
         waterEnergyRatio=8e1,
         growthRate=2.5e-2,
-        --coeffRainAfter1970=5e-1,
+        coeffRainAfter1970=5e-1,
     }
 }
 
