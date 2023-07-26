@@ -134,6 +134,23 @@ Cabe observar que, estamos desprezando o primeiro termo da progressão geométri
 
 Utilizando a Equação \ref{eq: anos_cota_inferior} podemos calcular o número de anos para esgotamento da represa considerando vários cenários. Os resultados dos cálculo podem ser vistos na Tabela \ref{tab:cotas_ano_esgotamento}. Esses resultados indicam que, não há possibilidade da água se esgotar antes de aproximadamente quatro ou cinco anos, a depender da eficiência da conversão de água em energia. Esses resultados também serão utilizados para testar a validade da implementação do modelo. 
 
+\begin{table}[ht!]
+    \centering
+    \caption{Ano de esgotamento do volume de água da represa, variando a taxa de crescimento de consumo de energia da população ($\alpha$) e a quantidade de água necessária para produção de energia ($\beta$). Os demais parâmetros foram utilizados com valores fixos: $N = 1e5$, $k = 10$ e $V_{max}^{rain} = 3.5e9$.}
+    \label{tab:cotas_ano_esgotamento}
+    \begin{tabular}{lcccccc}
+        \hline
+             & \multicolumn{2}{l}{Ausência de chuvas} & \multicolumn{2}{l}{Cotas inferiores} & \multicolumn{2}{l}{Cotas superiores} \\ \cline{2-7} 
+             & \multicolumn{2}{c}{$\alpha$}              & \multicolumn{2}{c}{$\alpha$}            & \multicolumn{2}{c}{$\alpha$}            \\ \cline{2-7} 
+        $\beta$ & 0.025               & 0.05               & 0.025              & 0.05              & 0.025              & 0.05           \\ \hline
+        80      & 1954                & 1954               & 2007               & 1981              & 2018               & 1987            \\
+        100     & 1954                & 1953               & 1997               & 1975              & 2010               & 1982            \\ \hline
+    \end{tabular}
+    {\flushleft Fonte: os autores. \par}
+\end{table}
+
+
+
 \subsubsection*{Cotas inferiores}
 
 Embora possamos utilizar os valores obtidos anteriormente como cotas inferiores, podemos obter cotas melhores. Há duas situações extremas, na primeira, as chuvas estão concentradas em um único mês, e na segunda, as chuvas estão distribuídas uniformemente durante o ano. A primeira situação, dificulta o aproveitamento da água da chuva, uma vez que a represa tem capacidade limitada, e é a condição que resulta no menor tempo necessário para esgotamento da água da represa. Nesse caso, observe que a água da represa só se esgotará após o consumo anual superar o volume de chuvas, desse modo:
@@ -173,84 +190,71 @@ De modo análogo ao caso anterior:
 \end{equation}
 As cotas calculadas a partir da equação \ref{eq: cota_superior} estão apresentados na Tabela \ref{tab:cotas_ano_esgotamento}.
 
-\subsubsection*{Considerações preliminares}
-
-\begin{table}[ht!]
-    \centering
-    \caption{Ano de esgotamento do volume de água da represa, variando a taxa de crescimento de consumo de energia da população ($\alpha$) e a quantidade de água necessária para produção de energia ($\beta$). Os demais parâmetros foram utilizados com valores fixos: $N = 1e5$, $k = 10$ e $V_{max}^{rain} = 3.5e9$.}
-    \label{tab:cotas_ano_esgotamento}
-    \begin{tabular}{lcccccc}
-        \hline
-             & \multicolumn{2}{l}{Ausência de chuvas} & \multicolumn{2}{l}{Cotas inferiores} & \multicolumn{2}{l}{Cotas superiores} \\ \cline{2-7} 
-             & \multicolumn{2}{c}{$\alpha$}              & \multicolumn{2}{c}{$\alpha$}            & \multicolumn{2}{c}{$\alpha$}            \\ \cline{2-7} 
-        $\beta$ & 0.025               & 0.05               & 0.025              & 0.05              & 0.025              & 0.05           \\ \hline
-        80      & 1954                & 1954               & 2007               & 1981              & 2018               & 1987            \\
-        100     & 1954                & 1953               & 1997               & 1975              & 2010               & 1982            \\ \hline
-    \end{tabular}
-    {\flushleft Fonte: os autores. \par}
-\end{table}
-
-
 \subsection*{Modelos}
 
 O modelo criado para simulação da dinâmica do sistema de interesse for desenvolvido em três etapas, com níveis de complexidade crescentes em relação a representação da chuva. O modelo criado na primeira etapa considera a chuva total distribuída igualmente ao longo do ano, e foi utilizada como base para as próximas etapas e para testes. O modelo criado na segunda etapa, faz distinção entre duas estações chuvosas, conforme descrito no enunciado. Foi adotado o período de seis meses para cada estação, com chuvas uniformemente distribuída entre os meses da mesma estação. Na terceira etapa, foram utilizados valores mensais de chuva distintos para cada mês do ano. A distribuição de chuvas foi derivada a partir da normal climatológica (médias de 30 anos - período 1991-2020) de pluviometria da cidade de São Paulo-SP (Figura \ref{fig:distribuicao_chuva}).
 
-%\begin{figure}
-%    \centering
-%    \caption{Distribuição de Chuvas ao longo do ano}
-%    \label{fig:distribuicao_chuva}
-%    \includegraphics[width=0.9\textwidth]{imagens/distribuicao_chuvas.png}
-%    {\flushleft Fonte: os autores, utilizando dados pluviométricos disponibilizados pelo Instituto Nacional de Meteorologia - INMET. \par}
-%\end{figure}
+\begin{figure}
+    \centering
+    \caption{Distribuição de Chuvas ao longo do ano}
+    \label{fig:distribuicao_chuva}
+    \includegraphics[width=0.9\textwidth]{imagens/pluviometria.png}
+    {\flushleft Fonte: os autores, utilizando dados pluviométricos disponibilizados pelo Instituto Nacional de Meteorologia - INMET. \par}
+\end{figure}
 
 Cabe notar que a distribuição de chuvas utilizada é um pouco diferente da distribuição do enunciado, onde aproximadamente 57,15\% e 42,85\% do total de chuvas ocorrem na primeira e na segunda estações chuvosas, respectivamente. Considerando os dados para a cidade de São Paulo e agosto como início da segunda estação chuvosa no ano, aproximadamente 64,7\% e 35.3\% das chuvas ocorrem na primeira e na segunda estações chuvosas, respectivamente. Considerando as cotas superiores e inferiores obtidas, bem como os resultados das simulações com chuvas uniformemente distribuídas ao longo do ano e longo de uma estação, essa diferença aparentemente não deve provocar alterações importantes nos resultados.
 
-\subsubsection*{Códigos}
-
-\begin{quadro}
-\caption{Código da função para atualização do volume de água na represa}
-\begin{threeparttable}[t]
-    \begin{lstlisting}
-    execute = function(model)
-        model.waterVol = model.waterVol - model.nInhab * model.energyCons * model.waterEnergyRatio + model.seasonRain
-
-        if model.waterVol > model.damCap then
-            model.waterVol = model.damCap
-        elseif model.waterVol < 0 then
-            model.waterVol = 0
-        end
-    end
-    \end{lstlisting}
-    \begin{tablenotes}[flushleft]
-        \item[] Fonte: os autores.
-    \end{tablenotes}
-\end{threeparttable}
-\end{quadro}
-
+%\subsubsection*{Códigos}
+%
+%\begin{quadro}
+%\caption{Código da função para atualização do volume de água na represa}
+%\begin{threeparttable}[t]
+%    \begin{lstlisting}
+%    execute = function(model)
+%        model.waterVol = model.waterVol - model.nInhab * model.energyCons * model.waterEnergyRatio + model.seasonRain
+%
+%        if model.waterVol > model.damCap then
+%            model.waterVol = model.damCap
+%        elseif model.waterVol < 0 then
+%            model.waterVol = 0
+%        end
+%    end
+%    \end{lstlisting}
+%    \begin{tablenotes}[flushleft]
+%        \item[] Fonte: os autores.
+%    \end{tablenotes}
+%\end{threeparttable}
+%\end{quadro}
+%
 \subsubsection*{Testes}
 
-%\begin{figure}[ht!]
-%    \centering
-%    \caption{Comparação entre as simulações dos modelos}
-%    \includegraphics[width=0.9\textwidth]{imagens/comparacao_modelos.png}
-%    \label{fig:comparacao_resultados}
-%    {\flushleft Fonte: os autores.\par}
-%\end{figure}
+Foram obtidos resultados muito próximos para as simulações dos modelos produzidos (Figura \ref{fig:comparacao_resultados}).
+
+\begin{figure}[ht!]
+    \centering
+    \caption{Comparação entre as simulações dos modelos}
+    \includegraphics[width=0.9\textwidth]{imagens/model_comp.png}
+    \label{fig:comparacao_resultados}
+    {\flushleft Fonte: os autores.\par}
+\end{figure}
 
 
 \subsection*{Resultados}
 
-%\begin{figure}[ht!]
-%    \centering
-%    \caption{Resultados das simulações}
-%    \label{fig:resultados}
-%    \subfigure[Modelo semestral]{
-%        \includegraphics[width=0.9\textwidth]{imagens/resultados_modelo2.png}
-%    }\\
-%    \subfigure[Modelo mensal]{
-%        \includegraphics[width=0.9\textwidth]{imagens/resultados_modelo3.png}
-%    }\\
-%    {\flushleft Fonte: os autores. \par}
-%\end{figure}
+
+Foram realizadas cinco simulações, numeradas de 1 a 5, que correspondem as situações descritas no enunciado (Figura \ref{fig:resultados}). Como podemos notar, a longo prazo a melhor estratégia para prolongamento da vida útil da represa é a economia de energia por habitante (ou qualquer outra estratégia que reduza a taxa de crescimento do consumo médio por 100 mil habitantes). A melhoria na eficiência do processo não garante muito tempo extra, em relação a situação de referência (Sim 1). Outra característica interessante é que a mudança da situação de represa cheia para represa vazia é relativamente repentina, em todas as situações, assim que o nível anual começa a baixar, rapidamente o volume de água se esgota.
+
+\begin{figure}[ht!]
+    \centering
+    \caption{Resultados das simulações}
+    \label{fig:resultados}
+    \subfigure[Modelo semestral]{
+        \includegraphics[width=0.9\textwidth]{imagens/model_v0.2.png}
+    }\\
+    \subfigure[Modelo mensal]{
+        \includegraphics[width=0.9\textwidth]{imagens/model_v1.1.png}
+    }\\
+    {\flushleft Fonte: os autores. \par}
+\end{figure}
 
 \end{document}
