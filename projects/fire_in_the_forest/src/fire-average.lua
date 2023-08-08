@@ -10,7 +10,7 @@ local m = MultipleRuns{
 	model = Fire,
 	repetition = 3,
 	parameters = {
-		empty = Choice{min = 0.2, max = 0.9, step = 0.01},--0.4,
+		empty = Choice{min = 0.9, max = 1.0, step = 0.01},--0.4,
 		dim = 20
 	},
 	forest = function(model)

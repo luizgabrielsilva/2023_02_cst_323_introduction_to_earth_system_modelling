@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Luiz Gabriel <luiz.gabriel.silva@usp.br>"]
 readme = "README.md"
-packages = [{include = "fire_in_the_forest"}]
+packages = [{include = "fire_in_the_forest"}, {include = "plots"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
