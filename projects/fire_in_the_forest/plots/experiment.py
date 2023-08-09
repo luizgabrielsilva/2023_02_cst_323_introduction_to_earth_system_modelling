@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.stats import bootstrap
 
 import pathlib
 
@@ -100,8 +101,8 @@ class Experiment:
             ax.fill_between(self.processed_data["empty"],
                             y1=high,
                             y2=low, 
-                            color="red",
-                            alpha=0.4)
+                            color=color,
+                            alpha=0.3)
             
         
         ax.set_xlabel("Probability of empty cells")
