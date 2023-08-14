@@ -12,12 +12,14 @@ local m = MultipleRuns{
 	model = Fire,
 	repetition = 50,
 	parameters = {
-        finalTime=150,
-		empty = Choice{min = 0.4, max = 0.6, step = 0.05},--0.4,
+        finalTime=1000,
+		empty = Choice{min = 0.4, max = 0.6, step = 0.01},--0.4,
 		dim = 50,
         neighborhood = "vonneumann",
         burningStepThreshold = 1,
-        burningProbability = 1
+        burningProbability = 1,
+        stepsForEvaluation = 150,
+        periodOfEvaluation = 10
 	},
 	forest = function(model)
 		return model.cs:state().forest or 0
@@ -32,7 +34,7 @@ local m = MultipleRuns{
 
 
 local basePath = "C:\\Users\\PC-INPE\\Documents\\pgser\\2023_02\\2023_02_cst_323_introduction_to_earth_system_modelling\\projects\\fire_in_the_forest\\data\\"
-local fileName = "experiment-1-limited-step005-ft150.csv"
+local fileName = "experiment-1-tests-04-06.csv"
 
 file = File(basePath .. fileName) -- resultado de cada uma das simulacoes
 file:write(m.output, ";")

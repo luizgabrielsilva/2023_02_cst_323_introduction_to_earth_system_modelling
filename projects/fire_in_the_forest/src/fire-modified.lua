@@ -20,6 +20,8 @@ Fire = Model{
     neighborhood="vonneumann",
     burningStepThreshold = 1,
     burningProbability = 1,
+    stepsForEvaluation = 100,
+    periodOfEvaluation = 10,
 	random = true,
 	init = function(model)
 		model.cell = Cell{
@@ -75,7 +77,16 @@ Fire = Model{
 		model.timer = Timer{
 			Event{action = model.cs},
 			Event{action = model.chart},
-			Event{action = model.map}
+			Event{action = model.map},
+            Event{start = model.stepsForEvaluation, period = model.periodOfEvaluation, action = function()
+                    local burning = model.cs:split("state").burning
+                    if burning == nil then
+                        model.timer:clear()
+                        return false
+                    end
+                end
+            }
+
 		}
 	end
 }
