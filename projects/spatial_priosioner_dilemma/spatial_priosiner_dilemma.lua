@@ -1,16 +1,16 @@
 Random{seed = 230556}
 
 payOff = {
-    cooperative = {cooperative = 1, noncooperative = 0},
-    noncooperative = {cooperative = 1.9, noncooperative = 0}
+    cooperate = {cooperate = 1, noncooperate = 0},
+    noncooperate = {cooperate = 1.88, noncooperate = 0}
 }
 
 spatialPD = Model{
     finalTime = 100,
-    dim = 100,
+    dim = 101,
     includeSelf = true,
     neighborhood = "moore",
-    propOfCooperatives = 0.9,
+    propOfCooperate = 0.9,
     init = function(model)
 
 --------------------------------------------------------------------------------
@@ -21,12 +21,11 @@ spatialPD = Model{
             state = function(cell)
                 local agent = cell:getAgent()
                 local status = agent.strategy
-                if status == "cooperative" and agent.newstrategy then status = "newcooperative" end
-                if status == "noncooperative" and agent.newstrategy then status = "newnoncooperative" end
+                if status == "cooperate" and agent.newstrategy then status = "newcooperate" end
+                if status == "noncooperate" and agent.newstrategy then status = "newnoncooperate" end
                 return status
             end
         }
-
 
         model.cs = CellularSpace{
             instance = model.cell,
@@ -42,10 +41,11 @@ spatialPD = Model{
 --------------------------------------------------------------------------------
 
         model.agent = Agent{
-            --strategy = Random{cooperative = model.propOfCooperatives,
-            --                  noncooperative = 1 - model.propOfCooperatives},
-            strategy = "cooperative",
+            strategy = "cooperate",
+            --strategy = Random{cooperate = model.propOfCooperate,
+            --                  noncooperate = 1 - model.propOfCooperate},
             newstrategy = false,
+            result = nil,
             play = function(agent)
                 agent.score = 0
                 forEachNeighbor(agent:getCell(), function(neighbor)
@@ -53,55 +53,30 @@ spatialPD = Model{
                 end)
             end,
 
-            test = function(agent)
-                forEachNeighbor(agent:getCell(), function(neighbor)
-                    local agentNeighbor = neighbor:getAgent()
-                    if agent:getCell().x == 3 and agent:getCell().y == 5 then
-                        print(agent:getCell().x, agent:getCell().y, agent.score, agent.strategy,
-                              agentNeighbor:getCell().x, agentNeighbor:getCell().y, agentNeighbor.score, agentNeighbor.strategy) end
-                end)
-            end,
+            getResults = function(agent)
 
-
-            updateStrategy = function(agent)
                 local bestScore = agent.score
                 local bestStrategy = agent.strategy
-
 
                 forEachNeighbor(agent:getCell(), function(neighbor)
                     local agentNeighbor = neighbor:getAgent()
 
                     if agentNeighbor.score > bestScore then
-
-
-                        if agent:getCell().x == 3 and agent:getCell().y == 5 then
-                            print("CANDIDATE:", agentNeighbor:getCell().x,agentNeighbor:getCell().y, agentNeighbor.score, agentNeighbor.strategy, agentNeighbor.newstrategy) end
-
-
                         bestScore = agentNeighbor.score
-                        --if agentNeighbor.newstrategy then
-                        --    if agentNeighbor.strategy == "cooperative" then bestStrategy = "noncooperative"
-                        --    else bestStrategy = "cooperative" end
-                        --end
-
                         bestStrategy = agentNeighbor.strategy
                     end
                 end)
 
+                agent.result = bestStrategy
+            end,
 
-
-                if bestStrategy ~= agent.strategy then
-
-                    agent.strategy = bestStrategy
+            updateStrategy = function(agent)
+                if agent.result ~= agent.strategy then
+                    agent.strategy = agent.result
                     agent.newstrategy = true
                 else
                     agent.newstrategy = false
                 end
-
-                if agent:getCell().x == 3 and agent:getCell().y == 5 then
-                    print(agent:getCell().x, agent:getCell().y, agent.score, agent.strategy, agent.newstrategy,
-                          bestScore, bestStrategy) end
-
             end
         }
 
@@ -116,7 +91,9 @@ spatialPD = Model{
         }
 
         model.env:createPlacement{strategy = "uniform"}
-        model.cs:get(5, 5):getAgent().strategy = "noncooperative"
+
+        local middle = math.floor(model.dim / 2)
+        model.cs:get(middle, middle):getAgent().strategy = "noncooperate"
 
 --------------------------------------------------------------------------------
 --- Creating map
@@ -125,8 +102,8 @@ spatialPD = Model{
         model.map = Map{
             target = model.cs,
             select = "state",
-            value = {"cooperative", "noncooperative",
-                     "newcooperative", "newnoncooperative"},
+            value = {"cooperate", "noncooperate",
+                     "newcooperate", "newnoncooperate"},
             color = {"blue", "red", "yellow", "green"},
             grid = true
         }
@@ -134,7 +111,7 @@ spatialPD = Model{
         model.chart = Chart{
             target = model.society,
             select = "strategy",
-            value = {"cooperative"}
+            value = {"cooperate"}
         }
 
 --------------------------------------------------------------------------------
@@ -146,7 +123,7 @@ spatialPD = Model{
             Event{action=model.chart},
             Event{action=function()
                 model.society:play()
-                model.society:test()
+                model.society:getResults()
                 model.society:updateStrategy()
             end}
         }
@@ -155,4 +132,4 @@ spatialPD = Model{
 
 }
 
-spatialPD{dim = 11, finalTime=3}:run()
+spatialPD{}:run()
