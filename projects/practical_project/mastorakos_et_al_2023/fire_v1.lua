@@ -36,7 +36,7 @@ Fire = Model{
 
     init = function(model)
         model.cell = Cell{
-            burningStatus = -1,
+            state = "unburned",
             clock = 0,
             init = function(cell)
                 cell.ignitionTime = model.ignitionTime * (1 - Random{min = -model.randCompIgnTime, max = model.randCompIgnTime}:sample())
@@ -45,17 +45,17 @@ Fire = Model{
             end,
 
             execute = function(cell)
-                if cell.burningStatus == 1 then
-                    --local phi = randomGenerator:sample()
-                    local dx = model.highOfRadFire * math.cos(randomGenerator:sample())
-                    local dy = model.highOfRadFire * math.sin(randomGenerator:sample())
-
-                    local cellGeoPosX, cellGeoPosY = getPos(cell.x, cell.y, model.delta)
-
-
-
-                    print(cell.ignitionTime, dx, dy, cellGeoPosX, cellGeoPosY)
-                end
+--                if cell.burningStatus == 1 then
+--                    local phi = randomGenerator:sample()
+--                    local dx = model.highOfRadFire * math.cos(randomGenerator:sample())
+--                    local dy = model.highOfRadFire * math.sin(randomGenerator:sample())
+--
+--                    local cellGeoPosX, cellGeoPosY = getPos(cell.x, cell.y, model.delta)
+--
+--
+--
+--                    print(cell.ignitionTime, dx, dy, cellGeoPosX, cellGeoPosY)
+--                end
 
 
 
@@ -67,37 +67,94 @@ Fire = Model{
             instance = model.cell
         }
 
+        model.cs:createNeighborhood()
+
+--------------------------------------------------------------------------------
+-- Agents
+--------------------------------------------------------------------------------
+
+        model.agent = Agent{
+            burningStatus = 1,
+
+            execute = function(agent)
+                local agentCell = agent:getCell()
+
+            end
+        }
+
+        model.society = Society{
+            instance = model.agent,
+            quantity = 1
+        }
+
+        model.env = Environment{
+            model.cs,
+            model.society
+        }
+
+        model.env:createPlacement()
+
+--------------------------------------------------------------------------------
+-- Inicialization
+--------------------------------------------------------------------------------
+
         local middle = math.floor(model.dim / 2)
-        model.cs:get(middle, middle).burningStatus = 1
+        model.cs:get(middle, middle).state = "burning"
 
 
-        print(model.cs:get(0, 0).ignitionTime)
+--------------------------------------------------------------------------------
+-- Visualizations
+--------------------------------------------------------------------------------
+--        model.map = Map{
+--            target = model.cs,
+--            select = "burningStatus",
+--            min = 0,
+--            max = 1,
+--            color = "Oranges",
+--            slices = 10,
+--            --invert = true,
+--            grid = true
+--        }
 
         model.map = Map{
             target = model.cs,
-            select = "burningStatus",
-            min = 0,
-            max = 1,
-            color = "Oranges",
-            slices = 10,
-            --invert = true,
+            select = "state",
+            value = {"unburned", "burning", "burned"},
+            color = {"green", "orange", "brown"},
             grid = true
         }
 
-        model.map_2 = Map{
-            target = model.cs,
-            select = "ignitionTime",
-            min = (1 - model.randCompIgnTime) * model.ignitionTime,
-            max = (1 + model.randCompIgnTime) * model.ignitionTime,
-            color = "RdBu",
-            slices = 10,
-            --invert = true,
-            grid = true
+--        model.map_2 = Map{
+--            target = model.cs,
+--            select = "ignitionTime",
+--            min = (1 - model.randCompIgnTime) * model.ignitionTime,
+--            max = (1 + model.randCompIgnTime) * model.ignitionTime,
+--            color = "RdBu",
+--            slices = 10,
+--            --invert = true,
+--            grid = true
+--        }
+
+        model.map = Map{
+            target = model.society,
+            --select = "burningStatus",
+            background = model.map,
+            color = "red",
+            --min = 0,
+            --max = 1,
+            --slices = 10,
         }
 
+
+
+
+
+--------------------------------------------------------------------------------
+-- Timer
+--------------------------------------------------------------------------------
         model.timer = Timer{
             Event{action = model.map},
-            Event{action = model.map_2},
+            Event{action = model.society},
             Event{action = model.cs}
         }
 
