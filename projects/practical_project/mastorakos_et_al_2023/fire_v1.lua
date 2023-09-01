@@ -1,4 +1,5 @@
 -- @delta: size of each cell in meters (m)
+-- @deltaT: time interval in seconds (s)
 -- @dim: dimension of cellular space
 -- @finalTime: number of simulation steps - time is measured in seconds (s)
 -- @criticalValue: critical value of burning status for a cell to be ignited - Ylim
@@ -9,6 +10,8 @@
 --------------------------------------------------------------------------------
 -- Auxiliary Functions
 --------------------------------------------------------------------------------
+
+Random{seed = 492431}
 
 getPos = function(coordX, coordY, delta) -- CellularSpace -> Geographic Space
     return (coordX + 0.5) * delta, (coordY + 0.5) * delta
@@ -25,8 +28,9 @@ randomGenerator = Random{min = 0, max = 2 * math.pi}
 
 Fire = Model{
     delta = 2,
-    dim = 11,
-    finalTime = 300,
+    deltaT = 10,
+    dim = 101,
+    finalTime = 50,
 
     criticalValue = 0.2,
     noWindPropSpeed = 0.1,
@@ -35,9 +39,59 @@ Fire = Model{
     randCompIgnTime = 0.1,
 
     init = function(model)
+
+--------------------------------------------------------------------------------
+-- Agents and Society
+--------------------------------------------------------------------------------
+
+        model.agent = Agent{
+            burningStatus = 1,
+
+            updateBurningStatus = function(agent)
+                local decayRate = model.highOfRadFire / model.noWindPropSpeed
+                agent.burningStatus = agent.burningStatus * (1 - model.deltaT / decayRate)
+            end,
+
+            execute = function(agent)
+                --local agentCell = agent:getCell()
+                agent:updateBurningStatus()
+
+                --if agent.burningStatus <= model.criticalValue then
+                --    agent:die()
+                --    return false
+                --end
+
+                agent:walk()
+            end
+        }
+
+        model.society = Society{
+            instance = model.agent,
+            quantity = 1
+        }
+
+--------------------------------------------------------------------------------
+-- Cell and Cellular Space
+--------------------------------------------------------------------------------
+
         model.cell = Cell{
-            state = "unburned",
+            state = "noninitiated",
             clock = 0,
+
+            updateClock = function(cell) cell.clock = cell.clock + model.deltaT end,
+            getBurned = function(cell) cell.state = "burned" end,
+            getIgnited = function(cell)
+                cell.state = "ignited"
+                local newAgent = model.society:add()
+                newAgent:enter(cell)
+            end,
+
+            getInitiated = function(cell)
+                cell.state = "preignited"
+                cell:updateClock()
+            end,
+
+
             init = function(cell)
                 cell.ignitionTime = model.ignitionTime * (1 - Random{min = -model.randCompIgnTime, max = model.randCompIgnTime}:sample())
 
@@ -56,8 +110,21 @@ Fire = Model{
 --
 --                    print(cell.ignitionTime, dx, dy, cellGeoPosX, cellGeoPosY)
 --                end
+                if cell.state == "ignited" then cell:getBurned() end
 
+                if cell.state == "preignited" then
+                    if cell.clock >= model.ignitionTime then cell:getIgnited()
+                    else cell:updateClock() end
+                end
 
+                if cell.state == "noninitiated" then
+                    forEachAgent(cell, function(agent)
+                        if agent.burningStatus > model.criticalValue then
+                            cell:getInitiated()
+                            return false
+                        end
+                    end)
+                end
 
             end
         }
@@ -70,38 +137,25 @@ Fire = Model{
         model.cs:createNeighborhood()
 
 --------------------------------------------------------------------------------
--- Agents
+-- Environment
 --------------------------------------------------------------------------------
-
-        model.agent = Agent{
-            burningStatus = 1,
-
-            execute = function(agent)
-                local agentCell = agent:getCell()
-
-            end
-        }
-
-        model.society = Society{
-            instance = model.agent,
-            quantity = 1
-        }
 
         model.env = Environment{
             model.cs,
             model.society
         }
 
-        model.env:createPlacement()
+        model.env:createPlacement{strategy = "void"}
 
 --------------------------------------------------------------------------------
 -- Inicialization
 --------------------------------------------------------------------------------
 
         local middle = math.floor(model.dim / 2)
-        model.cs:get(middle, middle).state = "burning"
-
-
+        model.cs:get(middle, middle).state = "ignited"
+        --model.cs:get(middle, middle):getIgnited()
+        local firstAgent = model.society.agents[1]
+        firstAgent:enter(model.cs:get(middle, middle))
 --------------------------------------------------------------------------------
 -- Visualizations
 --------------------------------------------------------------------------------
@@ -119,8 +173,8 @@ Fire = Model{
         model.map = Map{
             target = model.cs,
             select = "state",
-            value = {"unburned", "burning", "burned"},
-            color = {"green", "orange", "brown"},
+            value = {"noninitiated", "preignited", "ignited", "burned"},
+            color = {"gray", "yellow", "orange", "brown"},
             grid = true
         }
 
@@ -145,15 +199,19 @@ Fire = Model{
             --slices = 10,
         }
 
-
-
-
+        model.chart = Chart{
+            target = model.cs,
+            select = "state",
+            value = {"burned"}
+        }
 
 --------------------------------------------------------------------------------
 -- Timer
 --------------------------------------------------------------------------------
+
         model.timer = Timer{
             Event{action = model.map},
+            Event{action = model.chart},
             Event{action = model.society},
             Event{action = model.cs}
         }
@@ -162,4 +220,4 @@ Fire = Model{
 
 }
 
-Fire{finalTime = 1}:run()
+Fire{}:run()
