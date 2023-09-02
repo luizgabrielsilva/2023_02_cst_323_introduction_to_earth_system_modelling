@@ -7,6 +7,9 @@
 -- @highOfRadFire: high of radiation fire - fire without wind - Lr (m)
 -- @ignitionTime: time require to a cell to be ignited after receiving a cell with burningStatus > criticalValue (s)
 
+--@cell.ignitionTime: time required for a cell visited by a hot particle to ignite
+--@cell.windComponentX|Y: component of wind in the direction x|y (m/s)
+
 --------------------------------------------------------------------------------
 -- Auxiliary Functions
 --------------------------------------------------------------------------------
@@ -22,13 +25,14 @@ getCoord = function(posX, posY, delta) -- Geographic Space -> CellularSpace
 end
 
 
-randomGenerator = Random{min = 0, max = 2 * math.pi}
+randUniGen = Random{min = 0, max = 2 * math.pi}
+randNormGen = Random{distrib = "normal", mean = 0}
 
 
 
 Fire = Model{
-    delta = 2,
-    deltaT = 20,
+    delta = 1,
+    deltaT = 10,
     dim = 101,
     finalTime = 50,
 
@@ -45,23 +49,67 @@ Fire = Model{
 --------------------------------------------------------------------------------
 
         model.agent = Agent{
-            burningStatus = 1,
+
+            updateSpeed = function(agent)
+                local phi = randUniGen:sample()
+                local radSpeedX = model.noWindPropSpeed * math.sin(phi)
+                local radSpeedY = model.noWindPropSpeed * math.cos(phi)
+
+                local convSpeedX = 0
+                local convSpeedY = 0
+
+                agent.speedX = radSpeedX + convSpeedX
+                agent.speedY = radSpeedY + convSpeedY
+            end,
+
+
+            updatePosition = function(agent)
+                local posX, posY  = agent.posX, agent.posY
+                local agentCell = agent:getCell()
+
+
+                if agent.posX == nil then
+                    posX, posY = getPos(agentCell.x, agentCell.y, model.delta)
+                end
+
+                agent.posX = posX + agent.speedX * model.deltaT
+                agent.posY = posY + agent.speedY * model.deltaT
+
+            end,
+
 
             updateBurningStatus = function(agent)
                 local decayRate = model.highOfRadFire / model.noWindPropSpeed
                 agent.burningStatus = agent.burningStatus * (1 - model.deltaT / decayRate)
             end,
 
+            init = function(agent)
+                agent.burningStatus = 1
+                agent.speedX = 0
+                agent.speedY = 0
+                agent.posX = nil
+                agent.posY = nil
+
+            end,
+
+
             execute = function(agent)
                 --local agentCell = agent:getCell()
+                agent:updateSpeed()
+                agent:updatePosition()
                 agent:updateBurningStatus()
+
+                --local newCoordX, local newCoordY = getCoord(agent.posX, agent.posY, model.delta)
 
                 --if agent.burningStatus <= model.criticalValue then
                 --    agent:die()
                 --    return false
                 --end
+                --print(agent.speedX, agent.speedY, agent.posX, agent.posY, agent.burningStatus)
 
-                agent:walk()
+                agent:move(model.cs:get(getCoord(agent.posX, agent.posY, model.delta)))
+
+                --agent:walk()
             end
         }
 
@@ -78,6 +126,8 @@ Fire = Model{
             state = "noninitiated",
             clock = 0,
             burningDensity = 0,
+            windComponentX = 0,
+            windComponentY = 0,
 
             updateClock = function(cell) cell.clock = cell.clock + model.deltaT end,
             getBurned = function(cell) cell.state = "burned" end,
@@ -107,7 +157,7 @@ Fire = Model{
 
             init = function(cell)
                 cell.ignitionTime = model.ignitionTime * (1 - Random{min = -model.randCompIgnTime, max = model.randCompIgnTime}:sample())
-                --cell: getBurningDensity()
+
 
             end,
 
@@ -237,11 +287,11 @@ Fire = Model{
             Event{action = model.map},
             Event{action = model.map2},
             Event{action = model.society, priority="high"},
-            Event{action = model.cs},
+            Event{action = model.cs}
         }
 
     end
 
 }
 
-Fire{finalTime = 5, dim = 11, deltaT=10}:run()
+Fire{finalTime = 120, dim = 81, deltaT=10}:run()
