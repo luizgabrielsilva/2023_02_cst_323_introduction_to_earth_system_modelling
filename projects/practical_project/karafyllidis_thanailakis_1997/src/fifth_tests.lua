@@ -1,5 +1,5 @@
 Fire = Model{
-	finalTime = 90,
+	finalTime = 80,
 	--empty = Choice{min = 0, max = 1, default = 0.1},
 	dim = 81,
 	--random = true,
@@ -9,10 +9,10 @@ Fire = Model{
                 cell.state = 0
                 cell.fireSpeed = 0.1
 
-                cell.windN = 1.5
-                cell.windS = 0.5
-                cell.windE = 1
-                cell.windW = 1
+                cell.windN = 1
+                cell.windS = 1
+                cell.windE = 1.5
+                cell.windW = 0.5
                 cell.windNe = 1
                 cell.windSe = 1
                 cell.windNw = 1
@@ -35,7 +35,7 @@ Fire = Model{
                             neighborWeith = neighborWeith * cell.windN
                         elseif neighbor.y < cell.y then
                             neighborWeith = neighborWeith * cell.windS
-                        elseif neighbor.x > cell.x then
+                        elseif neighbor.x < cell.x then
                             neighborWeith = neighborWeith * cell.windE
                         else
                             neighborWeith = neighborWeith * cell.windW
@@ -72,8 +72,8 @@ Fire = Model{
 		model.cs:get(40,40).state = 1
 
 --        for i=25, 35 do
---            for j=40, 50 do
---                model.cs:get(i,j).fire_speed = 0.01
+--            for j=35, 45 do
+--                model.cs:get(i,j).fireSpeed = 0
 --            end
 --        end
 
@@ -83,7 +83,7 @@ Fire = Model{
 		model.map = Map{
 			target = model.cs,
 			select = "state",
-            min = 0,
+            min = 0.2,
             max = 1,
 			slices = 10,
 			color = "YlOrBr",
