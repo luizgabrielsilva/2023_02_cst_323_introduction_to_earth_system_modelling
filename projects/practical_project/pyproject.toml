@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "practical-project"
+version = "0.1.0"
+description = ""
+authors = ["Luiz Gabriel <luiz.gabriel.silva@alumni.usp.br>"]
+readme = "README.md"
+packages = [{include = "practical_project"}]
+
+[tool.poetry.dependencies]
+python = "3.10.12"
+seaborn = "^0.12.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

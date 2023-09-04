@@ -1,8 +1,6 @@
 Fire = Model{
 	finalTime = 100,
-	--empty = Choice{min = 0, max = 1, default = 0.1},
 	dim = 81,
-	--random = true,
 	init = function(model)
 		model.cell = Cell{
 			init = function(cell)
@@ -41,8 +39,6 @@ Fire = Model{
 --        end
 
         model.cs:createNeighborhood{}
---		model.cs:createNeighborhood{strategy = "vonneumann"}
---      model.cs:createNeighborhood{strategy = "diagonal"}
 
 		model.map = Map{
 			target = model.cs,

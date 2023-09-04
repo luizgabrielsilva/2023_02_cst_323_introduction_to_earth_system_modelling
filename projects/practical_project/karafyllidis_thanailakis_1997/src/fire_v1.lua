@@ -1,8 +1,6 @@
 Fire = Model{
 	finalTime = 100,
-	--empty = Choice{min = 0, max = 1, default = 0.1},
 	dim = 81,
-	--random = true,
 	init = function(model)
 		model.cell = Cell{
 			init = function(cell)
@@ -11,9 +9,6 @@ Fire = Model{
             end,
 
             execute = function(cell)
-                --print("Cell: ")
-                --print(cell)
-                --print("Neighbors: ")
                 if cell.state < 1 and cell.fire_speed > 0then
                     forEachNeighbor(cell, function(neighbor)
                         local neighborWeight = cell.fire_speed
@@ -27,7 +22,6 @@ Fire = Model{
                         cell.state = math.min(1, cell.state + neighborWeight * neighbor.past.state)
                     end)
                 end
-                --print(cell)
             end
 		}
 
